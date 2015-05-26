@@ -1,10 +1,19 @@
-# Creates a base ubuntu image with serf and dnsmasq
+# Creates a base ubuntu image with serf ,ssh and dnsmasq 
 FROM ubuntu:15.04
 
-MAINTAINER KiwenLau <kiwenlau@gmail.com>
+MAINTAINER Young <361242902@qq.com>
 
 RUN apt-get update && \
-apt-get install -y unzip curl dnsmasq
+apt-get install -y unzip curl dnsmasq openssh-server vim
+
+ADD files/* /usr/local/
+
+#configure ssh free key access
+RUN mkdir /var/run/sshd && \
+ssh-keygen -t rsa -f ~/.ssh/id_rsa -P '' && \
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && \
+mv /usr/local/ssh_config ~/.ssh/config && \
+sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 
 # dnsmasq configuration
 ADD dnsmasq/* /etc/
